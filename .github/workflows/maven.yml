@@ -16,7 +16,7 @@ deploy:
         ls -la *.war
 
     - name: Test Tomcat connection
-      run: |
+      run: | 
         echo "Testing Tomcat connection..."
         curl -v \
           "http://${{ secrets.TOMCAT_HOST }}/manager/text/list"
