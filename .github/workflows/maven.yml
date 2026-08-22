@@ -5,10 +5,12 @@ on:
     branches: [ main ]
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
 
     steps:
+
       # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,12 +43,14 @@ jobs:
           name: myapp
           path: github-actions-project-6pm-main/target/*.war
 
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment: production
 
     steps:
+
       # 6. Download WAR artifact
       - name: Download WAR artifact
         uses: actions/download-artifact@v4
@@ -60,9 +64,13 @@ jobs:
           ls -la *.war
 
       # 8. Deploy WAR to Tomcat
-      - name: Deploy to Tomcat
+      - name: Deploy WAR to Tomcat
         run: |
           WAR_FILE=$(ls *.war)
+
           echo "Deploying $WAR_FILE to Tomcat..."
-          curl -v --upload-file "$WAR_FILE" \
-            "http://${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}@${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
+
+          curl -v \
+            -u "${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}" \
+            --upload-file "$WAR_FILE" \
+            "http://${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
