@@ -26,12 +26,12 @@ jobs:
         run: |
           pwd
           ls -la
-          ls -la java-project-maven-new-master
-          find java-project-maven-new-master -name "pom.xml"
+          ls -la github-actions-project-6pm-main
+          find github-actions-project-6pm-main -name "pom.xml"
 
       # 4. Build with Maven
       - name: Build with Maven
-        working-directory: ./java-project-maven-new-master
+        working-directory: ./github-actions-project-6pm-main
         run: mvn clean package -DskipTests
 
       # 5. Upload WAR artifact
@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: myapp
-          path: java-project-maven-new-master/target/*.war
+          path: github-actions-project-6pm-main/target/*.war
 
   deploy:
     runs-on: ubuntu-latest
