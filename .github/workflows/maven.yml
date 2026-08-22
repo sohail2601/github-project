@@ -1,67 +1,19 @@
-name: Java CI/CD Pipeline to Tomcat
+- name: Debug Tomcat connection
+  env:
+    TOMCAT_HOST: ${{ secrets.TOMCAT_HOST }}
+    TOMCAT_USER: ${{ secrets.TOMCAT_USER }}
+    TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
+  run: |
+    echo "===== TOMCAT HOST ====="
+    printf '<%s>\n' "$TOMCAT_HOST"
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+    echo "===== TEST URL ====="
+    printf '<http://%s/manager/text/list>\n' "$TOMCAT_HOST"
 
-jobs:
+    echo "===== DNS TEST ====="
+    getent hosts "$TOMCAT_HOST" || true
 
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: maven
-
-      - name: Check project
-        run: |
-          pwd
-          ls -la
-          ls -la github-actions-project-6pm-main
-          find github-actions-project-6pm-main -name "pom.xml"
-
-      - name: Build with Maven
-        working-directory: ./github-actions-project-6pm-main
-        run: mvn clean package -DskipTests
-
-      - name: Upload WAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: myapp
-          path: github-actions-project-6pm-main/target/*.war
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment: production
-
-    steps:
-
-      - name: Download WAR artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: myapp
-
-      - name: Check WAR file
-        run: |
-          ls -la
-          ls -la *.war
-
-      - name: Deploy WAR to Tomcat
-        run: |
-          WAR_FILE=$(ls *.war)
-          echo "Deploying $WAR_FILE to Tomcat..."
-
-          curl -v \
-            -u "${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}" \
-            --upload-file "$WAR_FILE" \
-            "http://${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
+    echo "===== CURL TEST ====="
+    curl -v \
+      -u "$TOMCAT_USER:$TOMCAT_PASSWORD" \
+      "http://$TOMCAT_HOST/manager/text/list"
