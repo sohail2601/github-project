@@ -64,13 +64,14 @@ jobs:
           ls -la *.war
 
       # 8. Deploy WAR to Tomcat
-      - name: Deploy WAR to Tomcat
-        run: |
-          WAR_FILE=$(ls *.war)
+- name: Deploy WAR to Tomcat
+    run: |
+    WAR_FILE=$(ls *.war)
 
-          echo "Deploying $WAR_FILE to Tomcat..."
+    echo "WAR file: $WAR_FILE"
+    echo "Tomcat host configured."
 
-          curl -v \
-            -u "${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}" \
-            --upload-file "$WAR_FILE" \
-            "http://${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
+    curl -v \
+      -u "${{ secrets.TOMCAT_USER }}:${{ secrets.TOMCAT_PASSWORD }}" \
+      --upload-file "$WAR_FILE" \
+      "http://${{ secrets.TOMCAT_HOST }}/manager/text/deploy?path=/myapp&update=true"
